@@ -1,13 +1,15 @@
 Source: libevent
 Section: libs
 Priority: optional
-Maintainer: Anibal Monsalve Salazar <anibal@debian.org>
-Uploaders: Leo Costela <costela@debian.org>
+Maintainer: Pexip AS <packaging@pexip.com>
+XSBC-Pexip-Original-Maintainer: Anibal Monsalve Salazar <anibal@debian.org>
+XSBC-Pexip-Original-Uploaders: Leo Costela <costela@debian.org>
 Build-Depends: debhelper (>= 8), autotools-dev, libssl-dev
 Standards-Version: 3.9.2
 Homepage: http://www.monkey.org/~provos/libevent/
 Vcs-Browser: http://anonscm.debian.org/git/collab-maint/libevent.git
 Vcs-Git: git://git.debian.org/git/collab-maint/libevent.git
+XS-Pexip-Upstream: http://archive.ubuntu.com/ubuntu/ precise
 
 Package: libevent-dev
 Section: libdevel
