@@ -1,3 +1,13 @@
+libevent (2.0.16-stable-1ubuntu0.1) precise-security; urgency=medium
+
+  * SECURITY UPDATE: arbitrary code execution via evbuffer API
+    - debian/patches/CVE-2014-6272.patch: check sizes in buffer.c,
+      configure.in, evbuffer-internal.h.
+    - CVE-2014-6272
+  * debian/control: Added dh-autoreconf to Build-Depends
+
+ -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Fri, 16 Jan 2015 09:49:05 -0500
+
 libevent (2.0.16-stable-1) unstable; urgency=low
 
   * New upstream version 2.0.16-stable
