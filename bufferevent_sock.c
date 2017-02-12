@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2011 Niels Provos and Nick Mathewson
+ * Copyright (c) 2007-2012 Niels Provos and Nick Mathewson
  * Copyright (c) 2002-2006 Niels Provos <provos@citi.umich.edu>
  * All rights reserved.
  *
@@ -114,7 +114,7 @@ bufferevent_socket_outbuf_cb(struct evbuffer *buf,
 		/* Somebody added data to the buffer, and we would like to
 		 * write, and we were not writing.  So, start writing. */
 		if (be_socket_add(&bufev->ev_write, &bufev->timeout_write) == -1) {
-		    // Should we log this?
+		    /* Should we log this? */
 		}
 	}
 }
@@ -133,6 +133,9 @@ bufferevent_readcb(evutil_socket_t fd, short event, void *arg)
 	_bufferevent_incref_and_lock(bufev);
 
 	if (event == EV_TIMEOUT) {
+		/* Note that we only check for event==EV_TIMEOUT. If
+		 * event==EV_TIMEOUT|EV_READ, we can safely ignore the
+		 * timeout, since a read has occurred */
 		what |= BEV_EVENT_TIMEOUT;
 		goto error;
 	}
@@ -209,6 +212,9 @@ bufferevent_writecb(evutil_socket_t fd, short event, void *arg)
 	_bufferevent_incref_and_lock(bufev);
 
 	if (event == EV_TIMEOUT) {
+		/* Note that we only check for event==EV_TIMEOUT. If
+		 * event==EV_TIMEOUT|EV_WRITE, we can safely ignore the
+		 * timeout, since a read has occurred */
 		what |= BEV_EVENT_TIMEOUT;
 		goto error;
 	}

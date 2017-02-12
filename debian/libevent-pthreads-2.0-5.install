@@ -1,1 +1,1 @@
-usr/lib/libevent_pthreads-2.0.so*
+usr/lib/*/libevent_pthreads-2.0.so*

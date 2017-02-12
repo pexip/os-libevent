@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2011 Niels Provos, Nick Mathewson
+ * Copyright (c) 2009-2012 Niels Provos, Nick Mathewson
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -226,9 +226,15 @@ evconnlistener_new_bind(struct event_base *base, evconnlistener_cb cb,
 		}
 	}
 
-	setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, (void*)&on, sizeof(on));
+	if (setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, (void*)&on, sizeof(on))<0) {
+		evutil_closesocket(fd);
+		return NULL;
+	}
 	if (flags & LEV_OPT_REUSEABLE) {
-		evutil_make_listen_socket_reuseable(fd);
+		if (evutil_make_listen_socket_reuseable(fd) < 0) {
+			evutil_closesocket(fd);
+			return NULL;
+		}
 	}
 
 	if (sa) {
@@ -390,6 +396,12 @@ listener_read_cb(evutil_socket_t fd, short what, void *p)
 		evutil_socket_t new_fd = accept(fd, (struct sockaddr*)&ss, &socklen);
 		if (new_fd < 0)
 			break;
+		if (socklen == 0) {
+			/* This can happen with some older linux kernels in
+			 * response to nmap. */
+			evutil_closesocket(new_fd);
+			continue;
+		}
 
 		if (!(lev->flags & LEV_OPT_LEAVE_SOCKETS_BLOCKING))
 			evutil_make_socket_nonblocking(new_fd);
@@ -729,6 +741,10 @@ iocp_listener_disable_impl(struct evconnlistener *lev, int shutdown)
 		}
 		LeaveCriticalSection(&as->lock);
 	}
+
+	if (shutdown && lev->flags & LEV_OPT_CLOSE_ON_FREE)
+		evutil_closesocket(lev_iocp->fd);
+
 	UNLOCK(lev);
 	return 0;
 }

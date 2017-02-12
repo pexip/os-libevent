@@ -1,14 +1,14 @@
 Source: libevent
 Section: libs
 Priority: optional
-Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
-XSBC-Original-Maintainer: Anibal Monsalve Salazar <anibal@debian.org>
-Uploaders: Leo Costela <costela@debian.org>
-Build-Depends: debhelper (>= 8), autotools-dev, libssl-dev, dh-autoreconf
-Standards-Version: 3.9.2
-Homepage: http://www.monkey.org/~provos/libevent/
-Vcs-Browser: http://anonscm.debian.org/git/collab-maint/libevent.git
-Vcs-Git: git://git.debian.org/git/collab-maint/libevent.git
+Maintainer: Anibal Monsalve Salazar <anibal@debian.org>
+Uploaders: Leo Costela <costela@debian.org>,
+           Balint Reczey <balint@balintreczey.hu>
+Build-Depends: dpkg-dev (>= 1.16.1~), debhelper (>= 9), libssl-dev, dh-autoreconf
+Standards-Version: 3.9.3
+Homepage: http://libevent.org/
+Vcs-Browser: http://anonscm.debian.org/gitweb/?p=collab-maint/libevent.git
+Vcs-Git: git://anonscm.debian.org/collab-maint/libevent.git
 
 Package: libevent-dev
 Section: libdevel
@@ -29,6 +29,7 @@ Package: libevent-dbg
 Section: debug
 Priority: extra
 Architecture: any
+Multi-Arch: same
 Depends: ${misc:Depends}, libevent-2.0-5 (= ${binary:Version}),
  libevent-core-2.0-5 (= ${binary:Version}),
  libevent-extra-2.0-5 (= ${binary:Version}),
@@ -44,6 +45,8 @@ Description: Asynchronous event notification library (debug symbols)
 Package: libevent-2.0-5
 Priority: standard
 Architecture: any
+Multi-Arch: same
+Pre-Depends: ${misc:Pre-Depends}
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Asynchronous event notification library
  Libevent is an asynchronous event notification library that provides a
@@ -61,6 +64,8 @@ Description: Asynchronous event notification library
 
 Package: libevent-core-2.0-5
 Architecture: any
+Multi-Arch: same
+Pre-Depends: ${misc:Pre-Depends}
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Asynchronous event notification library (core)
  Libevent is an asynchronous event notification library that provides a
@@ -79,6 +84,8 @@ Description: Asynchronous event notification library (core)
 
 Package: libevent-extra-2.0-5
 Architecture: any
+Multi-Arch: same
+Pre-Depends: ${misc:Pre-Depends}
 Depends: ${shlibs:Depends}, ${misc:Depends},
  libevent-core-2.0-5 (= ${binary:Version})
 Description: Asynchronous event notification library (extra)
@@ -98,6 +105,8 @@ Description: Asynchronous event notification library (extra)
 
 Package: libevent-pthreads-2.0-5
 Architecture: any
+Multi-Arch: same
+Pre-Depends: ${misc:Pre-Depends}
 Depends: ${shlibs:Depends}, ${misc:Depends},
  libevent-core-2.0-5 (= ${binary:Version})
 Description: Asynchronous event notification library (pthreads)
@@ -115,6 +124,8 @@ Description: Asynchronous event notification library (pthreads)
 
 Package: libevent-openssl-2.0-5
 Architecture: any
+Multi-Arch: same
+Pre-Depends: ${misc:Pre-Depends}
 Depends: ${shlibs:Depends}, ${misc:Depends},
  libevent-core-2.0-5 (= ${binary:Version})
 Description: Asynchronous event notification library (openssl)

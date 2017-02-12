@@ -1,12 +1,87 @@
-libevent (2.0.16-stable-1ubuntu0.1) precise-security; urgency=medium
+libevent (2.0.21-stable-3) unstable; urgency=medium
 
-  * SECURITY UPDATE: arbitrary code execution via evbuffer API
-    - debian/patches/CVE-2014-6272.patch: check sizes in buffer.c,
-      configure.in, evbuffer-internal.h.
-    - CVE-2014-6272
-  * debian/control: Added dh-autoreconf to Build-Depends
+  * Fix three vulnerabilites (Closes: #854092):
+    - DNS remote stack overread vulnerability (CVE-2016-10195)
+    - (Stack) buffer overflow in evutil_parse_sockaddr_port()
+      (CVE-2016-10196)
+    - Out-of-bounds read in search_make_new() (CVE-2016-10197)
+  * Add myself as an uploader
+  * ACK NMU
 
- -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Fri, 16 Jan 2015 09:49:05 -0500
+ -- Balint Reczey <balint@balintreczey.hu>  Sun, 12 Feb 2017 21:43:18 +0100
+
+libevent (2.0.21-stable-2.1) unstable; urgency=medium
+
+  [ Helmut Grohne ]
+  * Non-maintainer upload.
+
+  [ Kurt Roeckx ]
+  * Add openssl_1.1.patch. Closes: #828393
+
+ -- Helmut Grohne <helmut@subdivi.de>  Thu, 03 Nov 2016 08:43:46 +0100
+
+libevent (2.0.21-stable-2) unstable; urgency=high
+
+  * Fix CVE-2014-6272: potential heap overflow in buffer/bufferevent APIs.
+    Add upstream patch: 20d6d445.patch.
+    Closes: #774645.
+  * Don't use deprecated compression for data tarball.
+    Use default compression for data tarball.
+
+ -- Anibal Monsalve Salazar <anibal@debian.org>  Wed, 07 Jan 2015 11:33:15 +0000
+
+libevent (2.0.21-stable-1.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Update config.* to fix FTBFS on ppc64el. Closes: #750693
+
+ -- Andreas Barth <aba@ayous.org>  Mon, 25 Aug 2014 16:03:50 +0000
+
+libevent (2.0.21-stable-1) unstable; urgency=low
+
+  * [dd23c3ce] Imported Upstream version 2.0.21-stable
+    - fix memleaks in evdns (closes: 679217)
+  * [bbc5530e] debian/control: use canonical VCS URL
+
+ -- Leo Costela <costela@debian.org>  Sun, 19 May 2013 00:40:30 +0200
+
+libevent (2.0.19-stable-3) unstable; urgency=low
+
+  * [ceb52d98] DH compatibility level is 9
+  * [7792ab18] Support multiarch (Closes: #675320)
+
+ -- Anibal Monsalve Salazar <anibal@debian.org>  Sat, 02 Jun 2012 13:27:56 +1000
+
+libevent (2.0.19-stable-2) unstable; urgency=low
+
+  * [cbdbe5b8] add hardening build-flags (Closes: 673707)
+  * [b5f4e321] change default compression to xz
+
+ -- Leo Costela <costela@debian.org>  Mon, 21 May 2012 00:16:59 +0200
+
+libevent (2.0.19-stable-1) unstable; urgency=low
+
+  * [21c5f34e] Imported Upstream version 2.0.19-stable
+  * [aad0456e] debian/watch: only check stable versions
+  * [09bb9c1d] debian/control: bump policy to 3.9.3 (no changes)
+
+ -- Leo Costela <costela@debian.org>  Mon, 07 May 2012 15:54:12 +0200
+
+libevent (2.0.18-stable-1) unstable; urgency=low
+
+  * [d094fba3] Imported Upstream version 2.0.18-stable
+  * [6717e7ac] correct vcs-browse link
+
+ -- Leo Costela <costela@debian.org>  Fri, 30 Mar 2012 16:24:30 +0200
+
+libevent (2.0.17-stable-1) unstable; urgency=low
+
+  * [98fed68d] Imported Upstream version 2.0.17-stable
+  * [82af6f34] update homepage to libevent.org
+  * [becd7e37] re-adding multiarch to TODO
+  * [8b2c71ac] shlibs: correct minimal version for current API (2.0.10)
+
+ -- Leo Costela <costela@debian.org>  Mon, 13 Feb 2012 23:32:24 +0100
 
 libevent (2.0.16-stable-1) unstable; urgency=low
 
