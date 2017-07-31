@@ -1,3 +1,40 @@
+libevent (2.1.8-stable-4) unstable; urgency=medium
+
+  * Don't link all libraries with -lcrypto (Closes: #869900)
+
+ -- Balint Reczey <rbalint@ubuntu.com>  Mon, 31 Jul 2017 18:13:49 +0200
+
+libevent (2.1.8-stable-3) unstable; urgency=medium
+
+  * Upload to unstable
+
+ -- Balint Reczey <rbalint@ubuntu.com>  Sun, 30 Jul 2017 08:08:13 +0200
+
+libevent (2.1.8-stable-2) experimental; urgency=medium
+
+  * Use my @ubuntu.com email address in Uploaders field
+  * Fix symbols files for hurd-* and kfreebsd-* architectures
+
+ -- Balint Reczey <rbalint@ubuntu.com>  Mon, 24 Jul 2017 17:49:43 +0200
+
+libevent (2.1.8-stable-1) experimental; urgency=low
+
+  * New upstream stable release (Closes: #853799, #833212)
+  * Drop patches integrated upstream
+  * Bump .so versions and related versions in package names
+  * Don't pass --no-undefined and --no-add-needed to ld
+  * Bump compat level to 10
+  * Tidy up d/control using cme fix dpkg-control
+  * Drop libevent-dbg package in favor of automatically generated dbgsym
+    packages
+  * Bump standards version to 3.9.8.
+    Migrating to using symbols files is recorded in TODO
+  * Drop dh-autoreconf patch which does not apply anymore
+  * Update shared library versions and start using symbols files
+  * Ship whatsnew-2.1.txt
+
+ -- Balint Reczey <balint@balintreczey.hu>  Mon, 13 Feb 2017 12:48:24 +0100
+
 libevent (2.0.21-stable-3) unstable; urgency=medium
 
   * Fix three vulnerabilites (Closes: #854092):

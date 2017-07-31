@@ -1,23 +1,25 @@
 Source: libevent
+Maintainer: Anibal Monsalve Salazar <anibal@debian.org>
+Uploaders: Balint Reczey <rbalint@ubuntu.com>
 Section: libs
 Priority: optional
-Maintainer: Anibal Monsalve Salazar <anibal@debian.org>
-Uploaders: Leo Costela <costela@debian.org>,
-           Balint Reczey <balint@balintreczey.hu>
-Build-Depends: dpkg-dev (>= 1.16.1~), debhelper (>= 9), libssl-dev, dh-autoreconf
-Standards-Version: 3.9.3
+Build-Depends: debhelper (>= 10~),
+               autotools-dev,
+               libssl-dev
+Standards-Version: 3.9.8
+Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/libevent.git
+Vcs-Git: https://anonscm.debian.org/git/collab-maint/libevent.git
 Homepage: http://libevent.org/
-Vcs-Browser: http://anonscm.debian.org/gitweb/?p=collab-maint/libevent.git
-Vcs-Git: git://anonscm.debian.org/collab-maint/libevent.git
 
 Package: libevent-dev
-Section: libdevel
 Architecture: any
-Depends: ${misc:Depends}, libevent-2.0-5 (= ${binary:Version}),
- libevent-core-2.0-5 (= ${binary:Version}),
- libevent-extra-2.0-5 (= ${binary:Version}),
- libevent-pthreads-2.0-5 (= ${binary:Version}),
- libevent-openssl-2.0-5 (= ${binary:Version})
+Section: libdevel
+Depends: ${misc:Depends},
+         libevent-2.1-6 (= ${binary:Version}),
+         libevent-core-2.1-6 (= ${binary:Version}),
+         libevent-extra-2.1-6 (= ${binary:Version}),
+         libevent-pthreads-2.1-6 (= ${binary:Version}),
+         libevent-openssl-2.1-6 (= ${binary:Version})
 Description: Asynchronous event notification library (development files)
  Libevent is an asynchronous event notification library that provides a 
  mechanism to execute a callback function when a specific event occurs
@@ -25,29 +27,13 @@ Description: Asynchronous event notification library (development files)
  .
  This package includes development files for compiling against libevent.
 
-Package: libevent-dbg
-Section: debug
-Priority: extra
+Package: libevent-2.1-6
 Architecture: any
 Multi-Arch: same
-Depends: ${misc:Depends}, libevent-2.0-5 (= ${binary:Version}),
- libevent-core-2.0-5 (= ${binary:Version}),
- libevent-extra-2.0-5 (= ${binary:Version}),
- libevent-pthreads-2.0-5 (= ${binary:Version}),
- libevent-openssl-2.0-5 (= ${binary:Version})
-Description: Asynchronous event notification library (debug symbols)
- Libevent is an asynchronous event notification library that provides a 
- mechanism to execute a callback function when a specific event occurs
- on a file descriptor or after a timeout has been reached.
- .
- This package includes debugging information for libevent.
-
-Package: libevent-2.0-5
 Priority: standard
-Architecture: any
-Multi-Arch: same
+Depends: ${shlibs:Depends},
+         ${misc:Depends}
 Pre-Depends: ${misc:Pre-Depends}
-Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Asynchronous event notification library
  Libevent is an asynchronous event notification library that provides a
  mechanism to execute a callback function when a specific event occurs
@@ -62,11 +48,12 @@ Description: Asynchronous event notification library
  the libevent library that includes everything in libevent_core and
  libevent_extra.
 
-Package: libevent-core-2.0-5
+Package: libevent-core-2.1-6
 Architecture: any
 Multi-Arch: same
+Depends: ${shlibs:Depends},
+         ${misc:Depends}
 Pre-Depends: ${misc:Pre-Depends}
-Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Asynchronous event notification library (core)
  Libevent is an asynchronous event notification library that provides a
  mechanism to execute a callback function when a specific event occurs
@@ -82,12 +69,13 @@ Description: Asynchronous event notification library (core)
  If you're writing software that only uses libevent's event loop, you
  should link against only the libevent_core library.
 
-Package: libevent-extra-2.0-5
+Package: libevent-extra-2.1-6
 Architecture: any
 Multi-Arch: same
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+         libevent-core-2.1-6 (= ${binary:Version})
 Pre-Depends: ${misc:Pre-Depends}
-Depends: ${shlibs:Depends}, ${misc:Depends},
- libevent-core-2.0-5 (= ${binary:Version})
 Description: Asynchronous event notification library (extra)
  Libevent is an asynchronous event notification library that provides a
  mechanism to execute a callback function when a specific event occurs
@@ -103,12 +91,13 @@ Description: Asynchronous event notification library (extra)
  If you're writing software that uses libevent's protocol support, you
  need to link libevent_core and libevent_extra as well.
 
-Package: libevent-pthreads-2.0-5
+Package: libevent-pthreads-2.1-6
 Architecture: any
 Multi-Arch: same
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+         libevent-core-2.1-6 (= ${binary:Version})
 Pre-Depends: ${misc:Pre-Depends}
-Depends: ${shlibs:Depends}, ${misc:Depends},
- libevent-core-2.0-5 (= ${binary:Version})
 Description: Asynchronous event notification library (pthreads)
  Libevent is an asynchronous event notification library that provides a
  mechanism to execute a callback function when a specific event occurs
@@ -122,12 +111,13 @@ Description: Asynchronous event notification library (pthreads)
  to link against the libevent_pthreads library in addition to
  libevent_core.
 
-Package: libevent-openssl-2.0-5
+Package: libevent-openssl-2.1-6
 Architecture: any
 Multi-Arch: same
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+         libevent-core-2.1-6 (= ${binary:Version})
 Pre-Depends: ${misc:Pre-Depends}
-Depends: ${shlibs:Depends}, ${misc:Depends},
- libevent-core-2.0-5 (= ${binary:Version})
 Description: Asynchronous event notification library (openssl)
  Libevent is an asynchronous event notification library that provides a
  mechanism to execute a callback function when a specific event occurs
