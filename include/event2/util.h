@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2011 Niels Provos and Nick Mathewson
+ * Copyright (c) 2007-2012 Niels Provos and Nick Mathewson
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -449,7 +449,11 @@ int evutil_snprintf(char *buf, size_t buflen, const char *format, ...)
 /** Replacement for vsnprintf to get consistent behavior on platforms for
     which the return value of snprintf does not conform to C99.
  */
-int evutil_vsnprintf(char *buf, size_t buflen, const char *format, va_list ap);
+int evutil_vsnprintf(char *buf, size_t buflen, const char *format, va_list ap)
+#ifdef __GNUC__
+	__attribute__((format(printf, 3, 0)))
+#endif
+;
 
 /** Replacement for inet_ntop for platforms which lack it. */
 const char *evutil_inet_ntop(int af, const void *src, char *dst, size_t len);

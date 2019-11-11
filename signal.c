@@ -2,7 +2,7 @@
 
 /*
  * Copyright 2000-2007 Niels Provos <provos@citi.umich.edu>
- * Copyright 2007-2011 Niels Provos and Nick Mathewson
+ * Copyright 2007-2012 Niels Provos and Nick Mathewson
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -354,7 +354,8 @@ evsig_del(struct event_base *base, evutil_socket_t evsignal, short old, short ev
 {
 	EVUTIL_ASSERT(evsignal >= 0 && evsignal < NSIG);
 
-	event_debug(("%s: %d: restoring signal handler", __func__, evsignal));
+	event_debug(("%s: "EV_SOCK_FMT": restoring signal handler",
+		__func__, EV_SOCK_ARG(evsignal)));
 
 	EVSIGBASE_LOCK();
 	--evsig_base_n_signals_added;

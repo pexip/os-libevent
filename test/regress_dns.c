@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2003-2007 Niels Provos <provos@citi.umich.edu>
- * Copyright (c) 2007-2011 Niels Provos and Nick Mathewson
+ * Copyright (c) 2007-2012 Niels Provos and Nick Mathewson
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -107,7 +107,7 @@ dns_gethostbyname_cb(int result, char type, int count, int ttl,
 		if (ttl < 0)
 			goto out;
 		for (i = 0; i < count; ++i) {
-			const char *b = inet_ntop(AF_INET6, &in6_addrs[i], buf,sizeof(buf));
+			const char *b = evutil_inet_ntop(AF_INET6, &in6_addrs[i], buf,sizeof(buf));
 			if (b)
 				TT_BLATHER(("%s ", b));
 			else
@@ -325,7 +325,7 @@ dns_server_gethostbyname_cb(int result, char type, int count, int ttl,
 		char buf[INET6_ADDRSTRLEN+1];
 		if (memcmp(&in6_addrs[0].s6_addr, "abcdefghijklmnop", 16)
 		    || ttl != 123) {
-			const char *b = inet_ntop(AF_INET6, &in6_addrs[0],buf,sizeof(buf));
+			const char *b = evutil_inet_ntop(AF_INET6, &in6_addrs[0],buf,sizeof(buf));
 			printf("Bad IPv6 response \"%s\" %d. ", b, ttl);
 			dns_ok = 0;
 			goto out;
@@ -862,6 +862,7 @@ end:
 /* === Test for bufferevent_socket_connect_hostname */
 
 static int total_connected_or_failed = 0;
+static int total_n_accepted = 0;
 static struct event_base *be_connect_hostname_base = NULL;
 
 /* Implements a DNS server for the connect_hostname test and the
@@ -995,7 +996,11 @@ nil_accept_cb(struct evconnlistener *l, evutil_socket_t fd, struct sockaddr *s,
 {
 	int *p = arg;
 	(*p)++;
+	++total_n_accepted;
 	/* don't do anything with the socket; let it close when we exit() */
+	if (total_n_accepted >= 3 && total_connected_or_failed >= 5)
+		event_base_loopexit(be_connect_hostname_base,
+		    NULL);
 }
 
 struct be_conn_hostname_result {
@@ -1015,14 +1020,14 @@ be_connect_hostname_event_cb(struct bufferevent *bev, short what, void *ctx)
 
 		if ((what & BEV_EVENT_CONNECTED) || (what & BEV_EVENT_ERROR)) {
 			int r;
-			++total_connected_or_failed;
-			TT_BLATHER(("Got %d connections or errors.", total_connected_or_failed));
 			if ((r = bufferevent_socket_get_dns_error(bev))) {
 				got->dnserr = r;
 				TT_BLATHER(("DNS error %d: %s", r,
 					   evutil_gai_strerror(r)));
-			}
-			if (total_connected_or_failed >= 5)
+			}			++total_connected_or_failed;
+			TT_BLATHER(("Got %d connections or errors.", total_connected_or_failed));
+
+			if (total_n_accepted >= 3 && total_connected_or_failed >= 5)
 				event_base_loopexit(be_connect_hostname_base,
 				    NULL);
 		}
@@ -1043,7 +1048,6 @@ test_bufferevent_connect_hostname(void *arg)
 	int expect_err5;
 	struct evdns_base *dns=NULL;
 	struct evdns_server_port *port=NULL;
-	evutil_socket_t server_fd=-1;
 	struct sockaddr_in sin;
 	int listener_port=-1;
 	ev_uint16_t dns_port=0;
@@ -1061,6 +1065,7 @@ test_bufferevent_connect_hostname(void *arg)
 	    &n_accept,
 	    LEV_OPT_REUSEABLE|LEV_OPT_CLOSE_ON_EXEC,
 	    -1, (struct sockaddr *)&sin, sizeof(sin));
+	tt_assert(listener);
 	listener_port = regress_get_socket_port(
 		evconnlistener_get_fd(listener));
 
@@ -1144,8 +1149,6 @@ test_bufferevent_connect_hostname(void *arg)
 end:
 	if (listener)
 		evconnlistener_free(listener);
-	if (server_fd>=0)
-		evutil_closesocket(server_fd);
 	if (port)
 		evdns_close_server_port(port);
 	if (dns)
@@ -1206,11 +1209,13 @@ test_getaddrinfo_async(void *arg)
 	int n_dns_questions = 0;
 
 	struct evdns_base *dns_base = evdns_base_new(data->base, 0);
+	tt_assert(dns_base);
 
 	/* for localhost */
 	evdns_base_load_hosts(dns_base, NULL);
 
 	memset(a_out, 0, sizeof(a_out));
+	memset(&local_outcome, 0, sizeof(local_outcome));
 
 	n_gai_results_pending = 10000; /* don't think about exiting yet. */
 
@@ -1239,7 +1244,7 @@ test_getaddrinfo_async(void *arg)
 	memset(&local_outcome, 0, sizeof(local_outcome));
 	r = evdns_getaddrinfo(dns_base, "www.google.com", "80",
 	    &hints, gai_cb, &local_outcome);
-	tt_int_op(r,==,0);
+	tt_ptr_op(r,==,NULL);
 	tt_int_op(local_outcome.err,==,EVUTIL_EAI_NONAME);
 	tt_ptr_op(local_outcome.ai,==,NULL);
 
@@ -1665,7 +1670,7 @@ static void
 cnt_free(void *ptr)
 {
 	allocated_chunks -= 1;
-	return free(ptr);
+	free(ptr);
 }
 
 struct testleak_env_t {
@@ -1699,6 +1704,7 @@ testleak_cleanup(const struct testcase_t *testcase, void *env_)
 {
 	int ok = 0;
 	struct testleak_env_t *env = env_;
+	tt_assert(env);
 #ifdef _EVENT_DISABLE_DEBUG_MODE
 	tt_int_op(allocated_chunks, ==, 0);
 #else
@@ -1707,12 +1713,13 @@ testleak_cleanup(const struct testcase_t *testcase, void *env_)
 #endif
 	ok = 1;
 end:
-	if (env->dns_base)
-		evdns_base_free(env->dns_base, 0);
-	if (env->base)
-		event_base_free(env->base);
-	if (env)
+	if (env) {
+		if (env->dns_base)
+			evdns_base_free(env->dns_base, 0);
+		if (env->base)
+			event_base_free(env->base);
 		free(env);
+	}
 	return ok;
 }
 

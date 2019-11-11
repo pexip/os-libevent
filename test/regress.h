@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2000-2007 Niels Provos <provos@citi.umich.edu>
- * Copyright (c) 2007-2011 Niels Provos and Nick Mathewson
+ * Copyright (c) 2007-2012 Niels Provos and Nick Mathewson
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -117,6 +117,10 @@ int _test_ai_eq(const struct evutil_addrinfo *ai, const char *sockaddr_port,
 	test_timeval_diff_leq((tv1), (tv2), (diff), 50)
 
 long timeval_msec_diff(const struct timeval *start, const struct timeval *end);
+
+#ifndef _WIN32
+pid_t regress_fork(void);
+#endif
 
 #ifdef __cplusplus
 }

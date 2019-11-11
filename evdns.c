@@ -1,18 +1,32 @@
-/* $Id: evdns.c 6979 2006-08-04 18:31:13Z nickm $ */
-
-/* The original version of this module was written by Adam Langley; for
- * a history of modifications, check out the subversion logs.
+/* Copyright 2006-2007 Niels Provos
+ * Copyright 2007-2012 Nick Mathewson and Niels Provos
  *
- * When editing this module, try to keep it re-mergeable by Adam.  Don't
- * reformat the whitespace, add Tor dependencies, or so on.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
  *
- * TODO:
- *   - Support IPv6 and PTR records.
- *   - Replace all externally visible magic numbers with #defined constants.
- *   - Write documentation for APIs of all external functions.
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* Async DNS Library
+/* Based on software by Adam Langly. Adam's original message:
+ *
+ * Async DNS Library
  * Adam Langley <agl@imperialviolet.org>
  * http://www.imperialviolet.org/eventdns.html
  * Public Domain code
@@ -167,6 +181,7 @@ struct request {
 	struct nameserver *ns;	/* the server which we last sent it */
 
 	/* these objects are kept in a circular list */
+	/* XXX We could turn this into a CIRCLEQ. */
 	struct request *next, *prev;
 
 	struct event timeout_event;
@@ -881,7 +896,12 @@ reply_handle(struct request *const req, u16 flags, u32 ttl, struct reply *reply)
 				    addrbuf, sizeof(addrbuf)));
 			break;
 		default:
-			/* we got a good reply from the nameserver */
+			/* we got a good reply from the nameserver: it is up. */
+			if (req->handle == req->ns->probe_request) {
+				/* Avoid double-free */
+				req->ns->probe_request = NULL;
+			}
+
 			nameserver_up(req->ns);
 		}
 
@@ -2118,9 +2138,8 @@ evdns_server_request_get_requesting_addr(struct evdns_server_request *_req, stru
 static void
 evdns_request_timeout_callback(evutil_socket_t fd, short events, void *arg) {
 	struct request *const req = (struct request *) arg;
-#ifndef _EVENT_DISABLE_THREAD_SUPPORT
 	struct evdns_base *base = req->base;
-#endif
+
 	(void) fd;
 	(void) events;
 
@@ -2135,11 +2154,19 @@ evdns_request_timeout_callback(evutil_socket_t fd, short events, void *arg) {
 
 	if (req->tx_count >= req->base->global_max_retransmits) {
 		/* this request has failed */
+		log(EVDNS_LOG_DEBUG, "Giving up on request %p; tx_count==%d",
+		    arg, req->tx_count);
 		reply_schedule_callback(req, 0, DNS_ERR_TIMEOUT, NULL);
 		request_finished(req, &REQ_HEAD(req->base, req->trans_id), 1);
 	} else {
 		/* retransmit it */
+		struct nameserver *new_ns;
+		log(EVDNS_LOG_DEBUG, "Retransmitting request %p; tx_count==%d",
+		    arg, req->tx_count);
 		(void) evtimer_del(&req->timeout_event);
+		new_ns = nameserver_pick(base);
+		if (new_ns)
+			req->ns = new_ns;
 		evdns_request_transmit(req);
 	}
 	EVDNS_UNLOCK(base);
@@ -2209,7 +2236,7 @@ evdns_request_transmit(struct request *req) {
 	default:
 		/* all ok */
 		log(EVDNS_LOG_DEBUG,
-		    "Setting timeout for request %p", req);
+		    "Setting timeout for request %p, sent to nameserver %p", req, req->ns);
 		if (evtimer_add(&req->timeout_event, &req->base->global_timeout) < 0) {
 			log(EVDNS_LOG_WARN,
 		      "Error from libevent when adding timer for request %p",
@@ -2230,13 +2257,16 @@ nameserver_probe_callback(int result, char type, int count, int ttl, void *addre
 	(void) ttl;
 	(void) addresses;
 
-	EVDNS_LOCK(ns->base);
-	ns->probe_request = NULL;
 	if (result == DNS_ERR_CANCEL) {
 		/* We canceled this request because the nameserver came up
 		 * for some other reason.  Do not change our opinion about
 		 * the nameserver. */
-	} else if (result == DNS_ERR_NONE || result == DNS_ERR_NOTEXIST) {
+		return;
+	}
+
+	EVDNS_LOCK(ns->base);
+	ns->probe_request = NULL;
+	if (result == DNS_ERR_NONE || result == DNS_ERR_NOTEXIST) {
 		/* this is a good reply */
 		nameserver_up(ns);
 	} else {
@@ -2261,7 +2291,10 @@ nameserver_send_probe(struct nameserver *const ns) {
 	handle = mm_calloc(1, sizeof(*handle));
 	if (!handle) return;
 	req = request_new(ns->base, handle, TYPE_A, "google.com", DNS_QUERY_NO_SEARCH, nameserver_probe_callback, ns);
-	if (!req) return;
+	if (!req) {
+		mm_free(handle);
+		return;
+	}
 	ns->probe_request = handle;
 	/* we force this into the inflight queue no matter what */
 	request_trans_id_set(req, transaction_id_pick(ns->base));
@@ -2341,6 +2374,10 @@ evdns_base_clear_nameservers_and_suspend(struct evdns_base *base)
 		(void) event_del(&server->event);
 		if (evtimer_initialized(&server->timeout_event))
 			(void) evtimer_del(&server->timeout_event);
+		if (server->probe_request) {
+			evdns_cancel_request(server->base, server->probe_request);
+			server->probe_request = NULL;
+		}
 		if (server->socket >= 0)
 			evutil_closesocket(server->socket);
 		mm_free(server);
@@ -2461,8 +2498,8 @@ _evdns_nameserver_add_impl(struct evdns_base *base, const struct sockaddr *addre
 		goto out2;
 	}
 
-	log(EVDNS_LOG_DEBUG, "Added nameserver %s",
-	    evutil_format_sockaddr_port(address, addrbuf, sizeof(addrbuf)));
+	log(EVDNS_LOG_DEBUG, "Added nameserver %s as %p",
+	    evutil_format_sockaddr_port(address, addrbuf, sizeof(addrbuf)), ns);
 
 	/* insert this nameserver into the list of them */
 	if (!base->server_head) {
@@ -2472,9 +2509,7 @@ _evdns_nameserver_add_impl(struct evdns_base *base, const struct sockaddr *addre
 		ns->next = base->server_head->next;
 		ns->prev = base->server_head;
 		base->server_head->next = ns;
-		if (base->server_head->prev == base->server_head) {
-			base->server_head->prev = ns;
-		}
+		ns->next->prev = ns;
 	}
 
 	base->global_good_nameservers++;
@@ -2497,6 +2532,7 @@ evdns_base_nameserver_add(struct evdns_base *base, unsigned long int address)
 {
 	struct sockaddr_in sin;
 	int res;
+	memset(&sin, 0, sizeof(sin));
 	sin.sin_addr.s_addr = address;
 	sin.sin_port = htons(53);
 	sin.sin_family = AF_INET;
@@ -3123,6 +3159,8 @@ search_request_new(struct evdns_base *base, struct evdns_request *handle,
 		handle->search_origname = mm_strdup(name);
 		if (handle->search_origname == NULL) {
 			/* XXX Should we dealloc req? If yes, how? */
+			if (req)
+				mm_free(req);
 			return NULL;
 		}
 		handle->search_state = base->global_search_state;
@@ -4181,6 +4219,8 @@ evdns_getaddrinfo_timeout_cb(evutil_socket_t fd, short what, void *ptr)
 
 	/* Cancel any pending requests, and note which one */
 	if (data->ipv4_request.r) {
+		/* XXXX This does nothing if the request's callback is already
+		 * running (pending_cb is set). */
 		evdns_cancel_request(NULL, data->ipv4_request.r);
 		v4_timedout = 1;
 		EVDNS_LOCK(data->evdns_base);
@@ -4188,6 +4228,8 @@ evdns_getaddrinfo_timeout_cb(evutil_socket_t fd, short what, void *ptr)
 		EVDNS_UNLOCK(data->evdns_base);
 	}
 	if (data->ipv6_request.r) {
+		/* XXXX This does nothing if the request's callback is already
+		 * running (pending_cb is set). */
 		evdns_cancel_request(NULL, data->ipv6_request.r);
 		v6_timedout = 1;
 		EVDNS_LOCK(data->evdns_base);
@@ -4210,6 +4252,10 @@ evdns_getaddrinfo_timeout_cb(evutil_socket_t fd, short what, void *ptr)
 			e = EVUTIL_EAI_AGAIN;
 		data->user_cb(e, NULL, data->user_data);
 	}
+
+	data->user_cb = NULL; /* prevent double-call if evdns callbacks are
+			       * in-progress. XXXX It would be better if this
+			       * weren't necessary. */
 
 	if (!v4_timedout && !v6_timedout) {
 		/* should be impossible? XXXX */
@@ -4278,6 +4324,13 @@ evdns_getaddrinfo_gotresolve(int result, char type, int count,
 		 * we already answered the user. */
 		if (other_req->r == NULL)
 			free_getaddrinfo_request(data);
+		return;
+	}
+
+	if (data->user_cb == NULL) {
+		/* We already answered.  XXXX This shouldn't be needed; see
+		 * comments in evdns_getaddrinfo_timeout_cb */
+		free_getaddrinfo_request(data);
 		return;
 	}
 
