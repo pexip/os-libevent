@@ -10,7 +10,7 @@ Standards-Version: 3.9.2
 Homepage: http://www.monkey.org/~provos/libevent/
 Vcs-Browser: http://anonscm.debian.org/git/collab-maint/libevent.git
 Vcs-Git: git://git.debian.org/git/collab-maint/libevent.git
-XS-Pexip-Upstream: http://archive.ubuntu.com/ubuntu/ precise
+XS-Pexip-Upstream: http://ftp.debian.org/debian/ stretch
 
 Package: libevent-dev
 Section: libdevel
