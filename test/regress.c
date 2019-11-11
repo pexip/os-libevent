@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2003-2007 Niels Provos <provos@citi.umich.edu>
- * Copyright (c) 2007-2011 Niels Provos and Nick Mathewson
+ * Copyright (c) 2007-2012 Niels Provos and Nick Mathewson
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -627,6 +627,31 @@ test_persistent_timeout(void)
 	event_del(&ev);
 }
 
+static void
+test_persistent_timeout_jump(void *ptr)
+{
+	struct basic_test_data *data = ptr;
+	struct event ev;
+	int count = 0;
+	struct timeval msec100 = { 0, 100 * 1000 };
+	struct timeval msec50 = { 0, 50 * 1000 };
+
+	event_assign(&ev, data->base, -1, EV_PERSIST, periodic_timeout_cb, &count);
+	event_add(&ev, &msec100);
+	/* Wait for a bit */
+#ifdef _WIN32
+	Sleep(1000);
+#else
+	sleep(1);
+#endif
+	event_base_loopexit(data->base, &msec50);
+	event_base_dispatch(data->base);
+	tt_int_op(count, ==, 1);
+
+end:
+	event_del(&ev);
+}
+
 struct persist_active_timeout_called {
 	int n;
 	short events[16];
@@ -677,9 +702,11 @@ test_persistent_active_timeout(void *ptr)
 	tv_exit.tv_usec = 600 * 1000;
 	event_base_loopexit(base, &tv_exit);
 
+	event_base_assert_ok(base);
 	evutil_gettimeofday(&start, NULL);
 
 	event_base_dispatch(base);
+	event_base_assert_ok(base);
 
 	tt_int_op(res.n, ==, 3);
 	tt_int_op(res.events[0], ==, EV_READ);
@@ -748,9 +775,11 @@ test_common_timeout(void *ptr)
 		}
 	}
 
+	event_base_assert_ok(base);
 	event_base_dispatch(base);
 
 	evutil_gettimeofday(&now, NULL);
+	event_base_assert_ok(base);
 
 	for (i=0; i<10; ++i) {
 		struct timeval tmp;
@@ -824,12 +853,19 @@ test_fork(void)
 	evsignal_set(&sig_ev, SIGCHLD, child_signal_cb, &got_sigchld);
 	evsignal_add(&sig_ev, NULL);
 
-	if ((pid = fork()) == 0) {
+	event_base_assert_ok(current_base);
+	TT_BLATHER(("Before fork"));
+	if ((pid = regress_fork()) == 0) {
 		/* in the child */
+		TT_BLATHER(("In child, before reinit"));
+		event_base_assert_ok(current_base);
 		if (event_reinit(current_base) == -1) {
 			fprintf(stdout, "FAILED (reinit)\n");
 			exit(1);
 		}
+		TT_BLATHER(("After reinit"));
+		event_base_assert_ok(current_base);
+		TT_BLATHER(("After assert-ok"));
 
 		evsignal_del(&sig_ev);
 
@@ -852,10 +888,12 @@ test_fork(void)
 		tt_fail_perror("write");
 	}
 
+	TT_BLATHER(("Before waitpid"));
 	if (waitpid(pid, &status, 0) == -1) {
 		fprintf(stdout, "FAILED (fork)\n");
 		exit(1);
 	}
+	TT_BLATHER(("After waitpid"));
 
 	if (WEXITSTATUS(status) != 76) {
 		fprintf(stdout, "FAILED (exit): %d\n", WEXITSTATUS(status));
@@ -1566,6 +1604,58 @@ test_priorities(void)
 		test_priorities_impl(3);
 }
 
+/* priority-active-inversion: activate a higher-priority event, and make sure
+ * it keeps us from running a lower-priority event first. */
+static int n_pai_calls = 0;
+static struct event pai_events[3];
+
+static void
+prio_active_inversion_cb(evutil_socket_t fd, short what, void *arg)
+{
+	int *call_order = arg;
+	*call_order = n_pai_calls++;
+	if (n_pai_calls == 1) {
+		/* This should activate later, even though it shares a
+		   priority with us. */
+		event_active(&pai_events[1], EV_READ, 1);
+		/* This should activate next, since its priority is higher,
+		   even though we activated it second. */
+		event_active(&pai_events[2], EV_TIMEOUT, 1);
+	}
+}
+
+static void
+test_priority_active_inversion(void *data_)
+{
+	struct basic_test_data *data = data_;
+	struct event_base *base = data->base;
+	int call_order[3];
+	int i;
+	tt_int_op(event_base_priority_init(base, 8), ==, 0);
+
+	n_pai_calls = 0;
+	memset(call_order, 0, sizeof(call_order));
+
+	for (i=0;i<3;++i) {
+		event_assign(&pai_events[i], data->base, -1, 0,
+		    prio_active_inversion_cb, &call_order[i]);
+	}
+
+	event_priority_set(&pai_events[0], 4);
+	event_priority_set(&pai_events[1], 4);
+	event_priority_set(&pai_events[2], 0);
+
+	event_active(&pai_events[0], EV_WRITE, 1);
+
+	event_base_dispatch(base);
+	tt_int_op(n_pai_calls, ==, 3);
+	tt_int_op(call_order[0], ==, 0);
+	tt_int_op(call_order[1], ==, 2);
+	tt_int_op(call_order[2], ==, 1);
+end:
+	;
+}
+
 
 static void
 test_multiple_cb(evutil_socket_t fd, short event, void *arg)
@@ -2065,6 +2155,10 @@ test_event_pending(void *ptr)
 	    NULL);
 	t = evtimer_new(data->base, timeout_cb, NULL);
 
+	tt_assert(r);
+	tt_assert(w);
+	tt_assert(t);
+
 	evutil_gettimeofday(&now, NULL);
 	event_add(r, NULL);
 	event_add(t, &tv);
@@ -2164,7 +2258,8 @@ end:
 		event_free(ev1);
 	if (ev2)
 		event_free(ev2);
-	close(dfd);
+	if (dfd >= 0)
+		close(dfd);
 }
 #endif
 
@@ -2325,11 +2420,12 @@ struct testcase_t main_testcases[] = {
 	BASIC(bad_assign, TT_FORK|TT_NEED_BASE|TT_NO_LOGS),
 	BASIC(bad_reentrant, TT_FORK|TT_NEED_BASE|TT_NO_LOGS),
 
-	/* These are still using the old API */
 	LEGACY(persistent_timeout, TT_FORK|TT_NEED_BASE),
+	{ "persistent_timeout_jump", test_persistent_timeout_jump, TT_FORK|TT_NEED_BASE, &basic_setup, NULL },
 	{ "persistent_active_timeout", test_persistent_active_timeout,
 	  TT_FORK|TT_NEED_BASE, &basic_setup, NULL },
 	LEGACY(priorities, TT_FORK|TT_NEED_BASE),
+	BASIC(priority_active_inversion, TT_FORK|TT_NEED_BASE),
 	{ "common_timeout", test_common_timeout, TT_FORK|TT_NEED_BASE,
 	  &basic_setup, NULL },
 
