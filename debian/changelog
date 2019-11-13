@@ -1,6 +1,7 @@
 libevent (2.0.21-stable-3pexip1) pexip; urgency=low
 
   * New upstream release
+  * Build with OpenSSL 1.0.2
 
  -- Alan Ford <alan@pexip.com>  Mon, 11 Nov 2019 15:11:02 +0000
 
