@@ -10,7 +10,7 @@ Standards-Version: 3.9.3
 Homepage: http://libevent.org/
 Vcs-Browser: http://anonscm.debian.org/gitweb/?p=collab-maint/libevent.git
 Vcs-Git: git://anonscm.debian.org/collab-maint/libevent.git
-XS-Pexip-Upstream: http://ftp.debian.org/debian/ stretch
+XS-Pexip-Upstream: http://ftp.debian.org/debian/ buster
 
 Package: libevent-dev
 Section: libdevel
