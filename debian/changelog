@@ -1,3 +1,9 @@
+libevent (2.1.8-stable-4pexip2) pexip; urgency=medium
+
+  * Rebuild in buster environment
+
+ -- Steve McIntyre <steve.mcintyre@pexip.com>  Wed, 15 Jul 2020 23:06:36 +0000
+
 libevent (2.1.8-stable-4pexip1) pexip; urgency=medium
 
   * Migrate to Buster
