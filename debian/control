@@ -4,7 +4,7 @@ XSBC-Pexip-Original-Maintainer: Balint Reczey <rbalint@ubuntu.com>
 Section: libs
 Priority: optional
 Build-Depends: debhelper-compat (= 12),
-               libssl1.0-dev
+               libssl-dev (>= 3)
 Standards-Version: 3.9.8
 Vcs-Git: https://salsa.debian.org/debian/libevent.git -b master
 Vcs-Browser: https://salsa.debian.org/debian/libevent
