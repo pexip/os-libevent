@@ -1,3 +1,44 @@
+libevent (2.1.12-stable-1) unstable; urgency=medium
+
+  [ Debian Janitor ]
+  * Trim trailing whitespace.
+  * Use secure URI in Homepage field.
+  * Use canonical URL in Vcs-Browser, Vcs-Git.
+
+  [ Balint Reczey ]
+  * New upstream version 2.1.12-stable
+  * Update symbols files
+  * Avoid undefined symbols (Closes: #948476)
+  * debian/watch: Use HTTPS
+
+ -- Balint Reczey <rbalint@ubuntu.com>  Sat, 11 Jul 2020 16:20:07 +0200
+
+libevent (2.1.11-stable-1) unstable; urgency=medium
+
+  [ Balint Reczey ]
+  * Downgrade priority of libevent-2.1-7 to optional (Closes: #940307)
+
+  [ Davor Ocelic ]
+  * debian/*.symbols: Allow building with musl (Closes: #941865)
+
+ -- Balint Reczey <rbalint@ubuntu.com>  Tue, 12 Nov 2019 12:18:47 +0100
+
+libevent (2.1.11-stable-1~exp0) experimental; urgency=medium
+
+  * Add Salsa CI config
+  * Move packaging to Salsa
+  * Replace Anibal Monsalve Salazar as Maintainer.
+    Thank you Anibal for taking care of libevent in the past! (Closes: #925085)
+  * New upstream version 2.1.11-stable
+  * Drop patch integrated upstream
+  * Bump SO versions and rename library packages
+  * Update symbols files
+  * Bump compat level to 12 and drop autotools-dev build-dependency
+  * debian/copyright: Update and make it machine-readable
+  * Override possible-gpl-code-linked-with-openssl Lintian warning
+
+ -- Balint Reczey <rbalint@ubuntu.com>  Tue, 20 Aug 2019 22:46:07 +0200
+
 libevent (2.1.8-stable-4pexip2) pexip; urgency=medium
 
   * Rebuild in buster environment
@@ -180,12 +221,12 @@ libevent (2.0.12-stable-1) experimental; urgency=low
   * [5217845e] bump compat to 8
   * [3237604b] remove old README.source
   * [0cc15d5b] remove README.Debian; install whatsnew-2.0.txt to docs instead
-  * [281c8d2e] source/options: don't set compression level (9 is the default 
+  * [281c8d2e] source/options: don't set compression level (9 is the default
                anyway)
   * [08517840] clean up debian/watch
   * [18d75ca4] remove unneeded debian/*.dirs
   * [1967343a] add TODO about cleaning up debian/copyright
-  * [c567b3fd] install pkgconfig file with more generic glob (*.pc, instead of 
+  * [c567b3fd] install pkgconfig file with more generic glob (*.pc, instead of
                libevent*.pc)
   * [3b6f7cb9] add ".pc" to .gitignore for quilt
   * [73325895] bump policy to 3.9.2 (no changes)

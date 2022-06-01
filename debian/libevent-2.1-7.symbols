@@ -1,4 +1,4 @@
-libevent-2.1.so.6 libevent-2.1-6 #MINVER#
+libevent-2.1.so.7 libevent-2.1-7 #MINVER#
  EVUTIL_ISALNUM_@Base 2.1.8-stable
  EVUTIL_ISALPHA_@Base 2.1.8-stable
  EVUTIL_ISDIGIT_@Base 2.1.8-stable
@@ -89,6 +89,8 @@ libevent-2.1.so.6 libevent-2.1-6 #MINVER#
  bufferevent_socket_get_conn_address_@Base 2.1.8-stable
  bufferevent_socket_get_dns_error@Base 2.1.8-stable
  bufferevent_socket_new@Base 2.1.8-stable
+ bufferevent_socket_set_conn_address_@Base 2.1.11-stable
+ bufferevent_socket_set_conn_address_fd_@Base 2.1.11-stable
  bufferevent_suspend_read_@Base 2.1.8-stable
  bufferevent_suspend_write_@Base 2.1.8-stable
  bufferevent_trigger@Base 2.1.8-stable
@@ -362,7 +364,7 @@ libevent-2.1.so.6 libevent-2.1-6 #MINVER#
  event_set_mem_functions@Base 2.1.8-stable
  event_sock_err@Base 2.1.8-stable
  event_sock_warn@Base 2.1.8-stable
- event_strlcpy_@Base 2.1.8-stable
+ (arch=!musl-linux-any)event_strlcpy_@Base 2.1.8-stable
  event_warn@Base 2.1.8-stable
  event_warnx@Base 2.1.8-stable
  evhttp_accept_socket@Base 2.1.8-stable
@@ -597,7 +599,9 @@ libevent-2.1.so.6 libevent-2.1-6 #MINVER#
  evutil_hex_char_to_int_@Base 2.1.8-stable
  evutil_inet_ntop@Base 2.1.8-stable
  evutil_inet_pton@Base 2.1.8-stable
+ evutil_inet_pton_scope@Base 2.1.12-stable
  evutil_make_internal_pipe_@Base 2.1.8-stable
+ evutil_make_listen_socket_ipv6only@Base 2.1.11-stable
  evutil_make_listen_socket_reuseable@Base 2.1.8-stable
  evutil_make_listen_socket_reuseable_port@Base 2.1.8-stable
  evutil_make_socket_closeonexec@Base 2.1.8-stable
@@ -629,6 +633,8 @@ libevent-2.1.so.6 libevent-2.1-6 #MINVER#
  evutil_strtoll@Base 2.1.8-stable
  evutil_tv_to_msec_@Base 2.1.8-stable
  evutil_usleep_@Base 2.1.8-stable
+ evutil_v4addr_is_local_@Base 2.1.11-stable
+ evutil_v6addr_is_local_@Base 2.1.11-stable
  evutil_vsnprintf@Base 2.1.8-stable
  evutil_weakrand_@Base 2.1.8-stable
  evutil_weakrand_range_@Base 2.1.8-stable
