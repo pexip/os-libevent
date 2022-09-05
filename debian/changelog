@@ -1,3 +1,9 @@
+libevent (2.1.12-stable-1pexip4) pexip-bullseye; urgency=medium
+
+  * Bullseye rebuild for ARM64 inclusion
+
+ -- Mark Hymers <mark.hymers@pexip.com>  Mon, 05 Sep 2022 10:32:16 +0100
+
 libevent (2.1.12-stable-1pexip3) pexip-bullseye; urgency=medium
 
   * Rebuild for override changes
