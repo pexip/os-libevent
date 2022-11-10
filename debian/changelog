@@ -1,6 +1,8 @@
 libevent (2.1.12-stable-1pexip5) pexip; urgency=medium
 
   * Build-Depend on libssl-dev 3
+  * debian/patches/openssl3-deprecations: patch usage of deprecated OpenSSL
+    APIs.
 
  -- John-Mark Bell <jmb@pexip.com>  Mon, 26 Jul 2021 16:01:18 +0100
 

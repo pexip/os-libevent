@@ -1,0 +1,17 @@
+diff --git a/sample/le-proxy.c b/sample/le-proxy.c
+index 13e0e2a..3a59da5 100644
+--- a/sample/le-proxy.c
++++ b/sample/le-proxy.c
+@@ -112,8 +112,12 @@ eventcb(struct bufferevent *bev, short what, void *ctx)
+ 				    ERR_reason_error_string(err);
+ 				const char *lib = (const char*)
+ 				    ERR_lib_error_string(err);
++#if OPENSSL_VERSION_NUMBER < 0x30000000L
+ 				const char *func = (const char*)
+ 				    ERR_func_error_string(err);
++#else
++				const char *func = "";
++#endif
+ 				fprintf(stderr,
+ 				    "%s in %s %s\n", msg, lib, func);
+ 			}
