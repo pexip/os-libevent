@@ -1,4 +1,4 @@
-libevent (2.1.12-stable-1pexip5) pexip; urgency=medium
+libevent (2.1.12-stable-1pexip5) pexip-bullseye-openssl3; urgency=medium
 
   * Build-Depend on libssl-dev 3
   * debian/patches/openssl3-deprecations: patch usage of deprecated OpenSSL
