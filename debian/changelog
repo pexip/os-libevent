@@ -1,3 +1,9 @@
+libevent (2.1.12-stable-1pexip7) pexip; urgency=medium
+
+  * No-change version bump
+
+ -- Huw Jones <huw@pexbuild>  Mon, 20 Feb 2023 11:40:48 +0000
+
 libevent (2.1.12-stable-1pexip6) pexip; urgency=medium
 
   * Merge openssl3 changes to bullseye
