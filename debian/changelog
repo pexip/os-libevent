@@ -1,3 +1,9 @@
+libevent (2.1.12-stable-8pexip1) pexip-bookworm; urgency=medium
+
+  * Initial bookworm build
+
+ -- Mark Hymers <mark.hymers@pexip.com>  Thu, 16 Nov 2023 10:06:07 +0000
+
 libevent (2.1.12-stable-8) unstable; urgency=medium
 
   * Upload to unstable
