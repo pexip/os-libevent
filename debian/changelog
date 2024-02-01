@@ -1,3 +1,9 @@
+libevent (2.1.12-stable-8+pexip24u3) pexip-bookworm; urgency=medium
+
+  * New versioning scheme
+
+ -- Mark Hymers <mark.hymers@pexip.com>  Thu, 01 Feb 2024 16:04:35 +0000
+
 libevent (2.1.12-stable-8pexip2) pexip-bookworm; urgency=medium
 
   * Bookworm build for product distribution
