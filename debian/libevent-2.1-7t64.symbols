@@ -1,5 +1,5 @@
 # SymbolsHelper-Confirmed: 2.1.8-stable amd64
-libevent-2.1.so.7 libevent-2.1-7 #MINVER#
+libevent-2.1.so.7 libevent-2.1-7t64 #MINVER#
 * Build-Depends-Package: libevent-dev
  EVUTIL_ISALNUM_@Base 2.1.8-stable
  EVUTIL_ISALPHA_@Base 2.1.8-stable
@@ -366,7 +366,6 @@ libevent-2.1.so.7 libevent-2.1-7 #MINVER#
  event_set_mem_functions@Base 2.1.8-stable
  event_sock_err@Base 2.1.8-stable
  event_sock_warn@Base 2.1.8-stable
- (arch=!musl-linux-any)event_strlcpy_@Base 2.1.8-stable
  event_warn@Base 2.1.8-stable
  event_warnx@Base 2.1.8-stable
  evhttp_accept_socket@Base 2.1.8-stable

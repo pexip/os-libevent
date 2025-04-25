@@ -1,3 +1,19 @@
+libevent (2.1.12-stable-10) unstable; urgency=medium
+
+  * d/symbols: Remove event_strlcpy_ symbol, now provided by glibc 2.38
+    (Closes: #1071323, #1055290)
+  * d/copyright: Update copyright year
+  * d/control: upgrade standards version to 4.7.0
+
+ -- Nicolas Mora <babelouest@debian.org>  Fri, 17 May 2024 19:19:31 -0400
+
+libevent (2.1.12-stable-8.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Rename libraries for 64-bit time_t transition.  Closes: #1062285
+
+ -- Benjamin Drung <bdrung@debian.org>  Wed, 28 Feb 2024 11:43:20 +0000
+
 libevent (2.1.12-stable-8+pexip24u3) pexip-bookworm; urgency=medium
 
   * New versioning scheme
