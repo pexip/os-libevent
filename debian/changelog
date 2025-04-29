@@ -1,3 +1,9 @@
+libevent (2.1.12-stable-10+pexip25u1) pexip-trixie; urgency=medium
+
+  * Initial trixie build
+
+ -- Mark Hymers <mark.hymers@pexip.com>  Tue, 29 Apr 2025 22:35:56 +0100
+
 libevent (2.1.12-stable-10) unstable; urgency=medium
 
   * d/symbols: Remove event_strlcpy_ symbol, now provided by glibc 2.38
