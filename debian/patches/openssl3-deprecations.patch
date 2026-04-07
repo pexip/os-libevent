@@ -1,3 +1,5 @@
+Replace use of old APIs which are deprecated in OpenSSL 3
+
 diff --git a/sample/le-proxy.c b/sample/le-proxy.c
 index 13e0e2a..3a59da5 100644
 --- a/sample/le-proxy.c
