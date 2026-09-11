@@ -68,6 +68,7 @@ libevent_extra-2.1.so.7 libevent-extra-2.1-7t64 #MINVER#
  evhttp_bound_socket_get_fd@Base 2.1.8-stable
  evhttp_bound_socket_get_listener@Base 2.1.8-stable
  evhttp_cancel_request@Base 2.1.8-stable
+ evhttp_check_transfer_encoding_@Base 2.1.13-stable
  evhttp_clear_headers@Base 2.1.8-stable
  evhttp_connection_base_bufferevent_new@Base 2.1.8-stable
  evhttp_connection_base_new@Base 2.1.8-stable
@@ -152,6 +153,7 @@ libevent_extra-2.1.so.7 libevent-extra-2.1-7t64 #MINVER#
  evhttp_start@Base 2.1.8-stable
  evhttp_start_read_@Base 2.1.8-stable
  evhttp_start_write_@Base 2.1.8-stable
+ evhttp_str_is_chunked_@Base 2.1.13-stable
  evhttp_uri_free@Base 2.1.8-stable
  evhttp_uri_get_fragment@Base 2.1.8-stable
  evhttp_uri_get_host@Base 2.1.8-stable

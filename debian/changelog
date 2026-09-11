@@ -1,3 +1,32 @@
+libevent (2.1.13-stable-1~deb13u1+pexip25u1) pexip-trixie; urgency=medium
+
+  * New upstream release with security fixes
+
+ -- Steve McIntyre <steve.mcintyre@pexip.com>  Fri, 11 Sep 2026 17:19:56 +0100
+
+libevent (2.1.13-stable-1~deb13u1) trixie-security; urgency=high
+
+  * Non-maintainer upload by the Security Team.
+  * Upload upstream stable point release to trixie:
+    CVE-2026-63379, CVE-2026-63381, CVE-2026-63382, CVE-2026-63383,
+    CVE-2026-63384, CVE-2026-63385, CVE-2026-63387, CVE-2026-63388.
+  * d/control: Revert to debhelper-compat 13 and Standards-Version 4.7.0 and
+    restore the Priority and Rules-Requires-Root fields.
+
+ -- Aron Xu <aron@debian.org>  Wed, 09 Sep 2026 13:10:27 +0800
+
+libevent (2.1.13-stable-1) unstable; urgency=medium
+
+  * New Upstream Release
+  * d/control: Upgrade Standards-Version to 4.7.4
+  * d/control: Remove Priority option
+  * d/control: Remove Rules-Requires-Root option
+  * d/control: Upgrade debhelper-compat version to 14
+  * d/symbols: update with new symbols
+  * d/*.lintian-overrides: disable unnecessary lintian-overrides
+
+ -- Nicolas Mora <babelouest@debian.org>  Wed, 01 Jul 2026 11:45:31 -0400
+
 libevent (2.1.12-stable-10+pexip25u2) pexip-trixie; urgency=medium
 
   * Trixie build for product distribution

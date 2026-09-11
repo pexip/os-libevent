@@ -13,7 +13,7 @@ Copyright: 2002-2005 Simon Law <sfllaw@debian.org>
            2007-2015  Anibal Monsalve Salazar <anibal@debian.org>
            2017-2020 Balint Reczey <rbalint@ubuntu.com>
            2022 Balint Reczey <balint@balintreczey.hu>
-           2022-2024 Nicolas Mora <babelouest@debian.org>
+           2022-2026 Nicolas Mora <babelouest@debian.org>
 License: BSD-3-clause
 
 Files: WIN32-Code/getopt.c
